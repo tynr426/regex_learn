@@ -2,6 +2,9 @@ use regex::Captures;
 use regex::Regex;
 fn main() {
     learn_captures();
+    learn_find();
+    learn_split();
+    
     learn_replace();
 }
 fn learn_captures() {
@@ -21,9 +24,22 @@ fn learn_captures() {
     println!("{},{},{}", &caps["year"], &caps["month"], &caps["day"]);
 
 }
+fn learn_find(){
+    let text = "Retroactively relinquishing remunerations is reprehensible.";
+    println!("{}",Regex::new(r"\b\w{13}\b").unwrap().is_match(text));
+    for mat in Regex::new(r"\b\w{13}\b").unwrap().find_iter(text) {
+        println!("word={:?}",text.get(mat.start()..mat.end()).map(|v| &*v));
+        println!("word={}",&text[mat.start()..mat.end()]);
+    }
+}
+fn learn_split(){
+    let re = Regex::new(r"[ \t]+").unwrap();
+    let fields: Vec<&str> = re.split("a b \t  c\td    e").collect();
+    println!("{:?}",fields);
+}
 fn learn_replace() {
     let re = Regex::new("([{,])\\s*\"?(\\w+)\"?\\s*:").unwrap();
-    let mut str1 = "{xy:7,xx:\"kk\",\"key\":\"bbb\"}";
+    let str1 = "{xy:7,xx:\"kk\",\"key\":\"bbb\"}";
     println!("{}", re.replace_all(str1, "$1\"$2\":"));
     let result = re.replace_all(str1, |caps: &Captures| {
         let temp = format!(
@@ -36,6 +52,7 @@ fn learn_replace() {
     });
     println!("result={:?}", result);
 
+    let mut str2 = "{xy:7,xx:\"kk\",\"key\":\"bbb\"}";
     for caps in re.captures_iter(str1) {
         let temp = format!(
             "{}\"{}\":",
@@ -47,6 +64,7 @@ fn learn_replace() {
             caps.get(1).unwrap().as_str(),
             caps.get(2).unwrap().as_str()
         );
-        str1=&str1.replace(caps, &temp);
+       // str2=&str2.replace(&replace_str, &temp);
+       println!("{}",str2.replace(&replace_str, &temp));
     }
 }
